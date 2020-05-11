@@ -30,3 +30,34 @@ export function getById(id) {
     method: 'get'
   })
 }
+
+export function add(user) {
+  return request({
+    url: `/system/users`,
+    method: 'post',
+    data: user
+  })
+}
+
+export function update(user) {
+  return request({
+    url: `/system/users`,
+    method: 'put',
+    data: user
+  })
+}
+
+export function delById(id) {
+  return request({
+    url: `/system/users/${id}`,
+    method: 'delete'
+  })
+}
+
+export function delByIds(ids) {
+  return request({
+    url: `/system/users/batch/delete`,
+    method: 'post',
+    data: ids
+  })
+}

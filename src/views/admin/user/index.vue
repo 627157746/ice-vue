@@ -21,7 +21,7 @@
                 :value="item.value"
               />
             </el-select>
-            <el-button v-waves class="filter-item" size="mini" type="success" icon="el-icon-search" @click="getList">
+            <el-button class="filter-item" size="mini" type="success" icon="el-icon-search" @click="getList">
               查询
             </el-button>
             <el-button class="filter-item" size="mini" icon="el-icon-refresh" @click="handleResetQuery">
@@ -38,6 +38,7 @@
           </el-row>
         </div>
         <el-table
+          ref="table"
           v-loading="initLoading"
           :data="list"
           border
@@ -109,7 +110,7 @@
                   type="text"
                   size="mini"
                   icon="el-icon-delete"
-                  @click="handleDel(scope.$index, scope.row)"
+                  @click="handleDel(scope.row.id)"
                 />
               </el-tooltip>
             </template>
@@ -124,39 +125,53 @@
         />
       </el-col>
     </el-row>
-    <el-dialog :title="title" :visible.sync="open" append-to-body>
+    <el-dialog
+      :title="title"
+      :visible.sync="open"
+      append-to-body
+      center
+    >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px" :disabled="formIsDisable">
         <el-row>
           <el-col :span="12">
             <el-form-item label="用户名" prop="username">
-              <el-input v-model="form.username" size="small" />
+              <el-input v-model="form.username" placeholder="请输入用户名" size="small" :disabled="!formIsAdd" />
+            </el-form-item>
+          </el-col>
+          <el-col v-if="formIsAdd&&!formIsDisable" :span="12">
+            <el-form-item label="密码" prop="password">
+              <el-input v-model="form.password" show-password placeholder="请输入密码" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="昵称" prop="nickname">
-              <el-input v-model="form.nickname" size="small" />
+              <el-input v-model="form.nickname" placeholder="请输入昵称" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="手机号" prop="phone">
-              <el-input v-model="form.phone" size="small" />
+              <el-input v-model="form.phone" placeholder="请输入手机号" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="头像地址" prop="avatar">
-              <el-input v-model="form.avatar" size="small" />
+            <el-form-item label="头像地址">
+              <el-input v-model="form.avatar" placeholder="为空则设置默认头像" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="部门" prop="deptName">
-              <!--<el-input v-model="form.deptName" size="small" />-->
+            <el-form-item label="部门" prop="deptId">
               <el-cascader
+                v-model="form.deptId"
+                :props="deptProps"
                 :options="deptTreeData"
+                :show-all-levels="false"
+                placeholder="请选择部门"
+                size="small"
               />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="角色" prop="roles">
+            <el-form-item label="角色" prop="roleIds">
               <el-select v-model="form.roleIds" multiple placeholder="请选择角色" value="roles" size="small">
                 <el-option
                   v-for="item in roles"
@@ -167,7 +182,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col v-show="formIsDisable" :span="12">
             <el-form-item label="创建时间">
               <el-date-picker
                 v-model="form.createTime"
@@ -177,7 +192,7 @@
               />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <el-col v-show="formIsDisable" :span="12">
             <el-form-item label="修改时间">
               <el-date-picker
                 v-model="form.updateTime"
@@ -195,23 +210,29 @@
                 inactive-color="#13ce66"
                 active-text="锁定"
                 inactive-text="正常"
+                size="small"
               />
             </el-form-item>
           </el-col>
           <el-col :span="24">
             <el-form-item label="备注">
-              <el-input v-model="form.remarks" size="small" />
+              <el-input v-model="form.remarks" placeholder="请输入备注" size="small" />
             </el-form-item>
           </el-col>
         </el-row>
       </el-form>
+      <span v-show="!formIsDisable" slot="footer" class="dialog-footer">
+        <el-button @click="open = false">取 消</el-button>
+        <el-button v-if="formIsAdd" type="success" @click="handleAdd">提 交</el-button>
+        <el-button v-else type="success" @click="handleUpdate">提 交</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
 
 <script>
 import { deptTree } from '@/api/dept'
-import { pageByQuery, getById } from '@/api/user'
+import { pageByQuery, getById, add, update, delById, delByIds } from '@/api/user'
 import { getRoles } from '@/api/role'
 import Pagination from '@/components/Pagination'
 export default {
@@ -224,6 +245,7 @@ export default {
       deptTreeData: null,
       roles: [],
       total: 0,
+      dept: null,
       query: {
         pageNum: 1,
         pageSize: 20,
@@ -232,12 +254,21 @@ export default {
         username: null,
         deptId: null
       },
+      deptProps: {
+        value: 'id',
+        emitPath: false
+      },
       title: '',
       open: false,
       form: {},
+      ids: [],
       formIsDisable: false,
+      formIsAdd: true,
       rules: {
         username: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ],
+        password: [
           { required: true, message: '请输入', trigger: 'blur' }
         ],
         nickname: [
@@ -246,14 +277,11 @@ export default {
         phone: [
           { required: true, message: '请输入', trigger: 'blur' }
         ],
-        avatar: [
-          { required: true, message: '请输入', trigger: 'blur' }
+        deptId: [
+          { required: true, message: '请选择', trigger: 'blur' }
         ],
-        deptName: [
-          { required: true, message: '请输入', trigger: 'blur' }
-        ],
-        roles: [
-          { required: true, message: '请输入', trigger: 'blur' }
+        roleIds: [
+          { required: true, message: '请选择', trigger: 'blur' }
         ]
       },
       userStatus: [
@@ -302,8 +330,7 @@ export default {
         nickname: undefined,
         phone: undefined,
         avatar: undefined,
-        deptName: undefined,
-        roles: [],
+        deptId: undefined,
         roleIds: [],
         createTime: undefined,
         updateTime: undefined,
@@ -314,8 +341,19 @@ export default {
     handleCreate() {
       this.resetForm()
       this.formIsDisable = false
+      this.formIsAdd = true
       this.open = true
       this.title = '添加用户信息'
+    },
+    handleEdit(id) {
+      this.resetForm()
+      this.formIsDisable = false
+      this.formIsAdd = false
+      getById(id).then(res => {
+        this.form = res.data
+        this.open = true
+        this.title = '编辑用户信息'
+      })
     },
     handleView(id) {
       this.resetForm()
@@ -326,14 +364,60 @@ export default {
         this.title = '查看用户信息'
       })
     },
-    async handleEdit(id) {
-      this.resetForm()
-      this.formIsDisable = false
-      await getById(id).then(res => {
-        this.form = res.data
-        this.open = true
-        this.title = '编辑用户信息'
+    handleAdd() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          add(this.form).then(res => {
+            this.$message.success('添加成功！')
+            this.open = false
+            this.getList()
+          })
+        }
       })
+    },
+    handleUpdate() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          update(this.form).then(res => {
+            this.$message.success('修改成功！')
+            this.open = false
+            this.getList()
+          })
+        }
+      })
+    },
+    handleDel(id) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delById(id).then(res => {
+          this.$message.success('删除成功！')
+          this.getList()
+        })
+      })
+    },
+    handleDelByIds() {
+      this.ids = []
+      const selection = this.$refs.table.selection
+      if (selection.length < 1) {
+        this.$message.error('请至少选择一项！')
+      } else {
+        selection.forEach(item => {
+          this.ids.push(item.id)
+        })
+        this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          delByIds(this.ids).then(res => {
+            this.$message.success('批量删除成功！')
+            this.getList()
+          })
+        })
+      }
     }
   }
 
