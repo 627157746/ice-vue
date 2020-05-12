@@ -378,6 +378,7 @@ export default {
     handleUpdate() {
       this.$refs.form.validate((valid) => {
         if (valid) {
+          delete this.form.updateTime
           update(this.form).then(res => {
             this.$message.success('修改成功！')
             this.open = false

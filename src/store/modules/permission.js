@@ -26,17 +26,23 @@ export function generaMenu(routes, data) {
     const menu = {
       path: item.path,
       component: component,
+      hidden: item.hidden,
+      noCache: item.noCache,
       children: [],
-      name: item.name,
       meta: { title: item.name, icon: item.icon }
+    }
+    if (item.component !== 'Layout') {
+      menu.name = item.component
+    } else {
+      menu.redirect = 'noRedirect'
     }
     if (item.children) {
       generaMenu(menu.children, item.children)
     }
     routes.push(menu)
   })
-  const notFount = { path: '*', redirect: '/404', hidden: true }
-  routes.push(notFount)
+  const notFoundPage = { path: '*', redirect: '/404', hidden: true }
+  routes.push(notFoundPage)
 }
 
 const state = {

@@ -6,3 +6,10 @@ export function getMenusByCurrentUser() {
     method: 'get'
   })
 }
+
+export function getMenuTree() {
+  return request({
+    url: '/system/menus/tree',
+    method: 'get'
+  })
+}
