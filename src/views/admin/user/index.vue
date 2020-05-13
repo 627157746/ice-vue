@@ -130,6 +130,7 @@
       :visible.sync="open"
       append-to-body
       center
+      @close="closeDialog"
     >
       <el-form ref="form" :model="form" :rules="rules" label-width="80px" :disabled="formIsDisable">
         <el-row>
@@ -222,7 +223,7 @@
         </el-row>
       </el-form>
       <span v-show="!formIsDisable" slot="footer" class="dialog-footer">
-        <el-button @click="open = false">取 消</el-button>
+        <el-button @click="closeDialog">取 消</el-button>
         <el-button v-if="formIsAdd" type="success" @click="handleAdd">提 交</el-button>
         <el-button v-else type="success" @click="handleUpdate">提 交</el-button>
       </span>
@@ -323,6 +324,10 @@ export default {
       this.query.phone = null
       this.query.deptId = null
       this.getList()
+    },
+    closeDialog() {
+      this.$refs.form.resetFields()
+      this.open = false
     },
     resetForm() {
       this.form = {

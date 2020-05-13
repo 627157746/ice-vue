@@ -2,7 +2,7 @@ import { constantRoutes } from '@/router'
 import { getMenusByCurrentUser } from '@/api/menu'
 import Layout from '@/layout'
 
-const routeMap = {
+const componentMap = {
   user: () => import('@/views/admin/user/index'),
   role: () => import('@/views/admin/role/index'),
   menu: () => import('@/views/admin/menu/index'),
@@ -12,16 +12,15 @@ const routeMap = {
   log: () => import('@/views/setting/log/index'),
   token: () => import('@/views/setting/token/index')
 }
-export const asyncRoutes = [
+const asyncRoutes = []
 
-]
 export function generaMenu(routes, data) {
   data.forEach(item => {
     let component
     if (item.component === 'Layout') {
       component = Layout
     } else {
-      component = routeMap[`${item.component}`]
+      component = componentMap[`${item.component}`]
     }
     const menu = {
       path: item.path,
