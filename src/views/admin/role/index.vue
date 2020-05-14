@@ -77,6 +77,14 @@
               @click="handleDel(scope.row.id)"
             />
           </el-tooltip>
+          <el-tooltip class="item" effect="dark" content="权限" placement="top-start">
+            <el-button
+              type="text"
+              size="mini"
+              icon="el-icon-menu"
+              @click="handleEditPermission(scope.row.id)"
+            />
+          </el-tooltip>
         </template>
       </el-table-column>
     </el-table>
@@ -87,11 +95,60 @@
       :limit.sync="query.pageSize"
       @pagination="getList"
     />
+    <el-dialog
+      :title="title"
+      :visible.sync="open"
+      append-to-body
+      center
+      @close="closeDialog"
+    >
+      <el-form ref="form" :model="form" :rules="rules" label-width="80px" :disabled="formIsDisable">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="名称" prop="name">
+              <el-input v-model="form.name" placeholder="请输入用户名" size="small" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="备注" prop="remarks">
+              <el-input v-model="form.remarks" placeholder="请输入备注" size="small" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+      </el-form>
+      <span v-show="!formIsDisable" slot="footer" class="dialog-footer">
+        <el-button @click="closeDialog">取 消</el-button>
+        <el-button v-if="formIsAdd" type="success" @click="handleAdd">提 交</el-button>
+        <el-button v-else type="success" @click="handleUpdate">提 交</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      title="权限编辑"
+      :visible.sync="permissionDialogOpen"
+      append-to-body
+      center
+      width="30%"
+    >
+      <el-tree
+        ref="menuTree"
+        :data="menuTree"
+        default-expand-all
+        node-key="id"
+        check-strictly
+        show-checkbox
+        :props="menuTreeProp"
+      />
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="permissionDialogOpen = false">取 消</el-button>
+        <el-button type="success" @click="handleUpdatePermission">提 交</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { pageByQuery } from '@/api/role'
+import { pageByQuery, getById, getMenuIdsById, add, update, updateRoleMenuById, delById } from '@/api/role'
+import { getMenuTree } from '@/api/menu'
 import Pagination from '@/components/Pagination'
 export default {
   name: 'Index',
@@ -99,17 +156,34 @@ export default {
   data() {
     return {
       list: null,
+      menuTree: [],
       initLoading: false,
       query: {
         pageNum: 1,
         pageSize: 20,
         name: null
       },
-      total: 0
+      total: 0,
+      title: '',
+      open: false,
+      permissionDialogOpen: false,
+      id: null,
+      form: {},
+      formIsDisable: false,
+      formIsAdd: true,
+      menuTreeProp: {
+        label: 'name'
+      },
+      rules: {
+        name: [
+          { required: true, message: '请输入', trigger: 'blur' }
+        ]
+      }
     }
   },
   created() {
     this.getList()
+    this.getMenuTreeData()
   },
   methods: {
     getList() {
@@ -120,9 +194,98 @@ export default {
         this.initLoading = false
       })
     },
+    getMenuTreeData() {
+      getMenuTree(true).then(res => {
+        this.menuTree = res.data
+      })
+    },
     handleResetQuery() {
       this.query.name = null
       this.getList()
+    },
+    resetForm() {
+      this.form = {
+        name: undefined,
+        remarks: undefined,
+        createTime: undefined,
+        updateTime: undefined
+      }
+    },
+    closeDialog() {
+      this.$refs.form.resetFields()
+      this.open = false
+    },
+    handleCreate() {
+      this.resetForm()
+      this.formIsDisable = false
+      this.formIsAdd = true
+      this.open = true
+      this.title = '添加角色信息'
+    },
+    handleAdd() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          add(this.form).then(res => {
+            this.$message.success('添加成功！')
+            this.open = false
+            this.getList()
+          })
+        }
+      })
+    },
+    handleUpdate() {
+      this.$refs.form.validate((valid) => {
+        if (valid) {
+          delete this.form.updateTime
+          update(this.form).then(res => {
+            this.$message.success('修改成功！')
+            this.open = false
+            this.getList()
+          })
+        }
+      })
+    },
+    handleEdit(id) {
+      this.resetForm()
+      this.formIsDisable = false
+      this.formIsAdd = false
+      getById(id).then(res => {
+        this.form = res.data
+        this.open = true
+        this.title = '编辑角色信息'
+      })
+    },
+    handleEditPermission(id) {
+      this.id = null
+      getMenuIdsById(id).then(res => {
+        this.permissionDialogOpen = true
+        this.id = id
+        this.$nextTick(() => {
+          this.$refs.menuTree.setCheckedKeys(res.data)
+        })
+      })
+    },
+    handleUpdatePermission() {
+      this.$nextTick(() => {
+        const menuIds = this.$refs.menuTree.getCheckedKeys()
+        updateRoleMenuById(this.id, menuIds).then(res => {
+          this.$message.success('修改成功！')
+          this.permissionDialogOpen = false
+          this.getList()
+        })
+      })
+    },
+    handleDel(id) {
+      this.$confirm('此操作将永久删除, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        delById(id).then(res => {
+          this.$message.success('删除成功！')
+          this.getList()
+        })
+      })
     }
   }
 }

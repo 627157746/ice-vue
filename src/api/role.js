@@ -22,25 +22,47 @@ export function pageByQuery(query) {
   })
 }
 
-export function addRole(data) {
+export function getById(id) {
   return request({
-    url: '/vue-element-admin/role',
+    url: `/system/roles/${id}`,
+    method: 'get'
+  })
+}
+
+export function getMenuIdsById(id) {
+  return request({
+    url: `/system/roles/menus/${id}`,
+    method: 'get'
+  })
+}
+
+export function add(role) {
+  return request({
+    url: `/system/roles`,
     method: 'post',
-    data
+    data: role
   })
 }
 
-export function updateRole(id, data) {
+export function update(role) {
   return request({
-    url: `/vue-element-admin/role/${id}`,
+    url: `/system/roles`,
     method: 'put',
-    data
+    data: role
   })
 }
 
-export function deleteRole(id) {
+export function updateRoleMenuById(id, menuIds) {
   return request({
-    url: `/vue-element-admin/role/${id}`,
+    url: `/system/roles/${id}`,
+    method: 'put',
+    data: menuIds
+  })
+}
+
+export function delById(id) {
+  return request({
+    url: `/system/roles/${id}`,
     method: 'delete'
   })
 }
