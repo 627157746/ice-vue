@@ -125,7 +125,7 @@
 <script>
 import { deptTree, getById, add, update, delById } from '@/api/dept'
 export default {
-  name: 'Index',
+  name: 'Dept',
   data() {
     return {
       deptTree: [],

@@ -3,19 +3,19 @@ import { getMenusByCurrentUser } from '@/api/menu'
 import Layout from '@/layout'
 
 const componentMap = {
-  user: () => import('@/views/admin/user/index'),
-  role: () => import('@/views/admin/role/index'),
-  menu: () => import('@/views/admin/menu/index'),
-  dept: () => import('@/views/admin/dept/index'),
-  client: () => import('@/views/setting/client/index'),
-  dict: () => import('@/views/setting/dict/index'),
-  log: () => import('@/views/setting/log/index'),
-  token: () => import('@/views/setting/token/index')
+  User: () => import('@/views/admin/user/index'),
+  Role: () => import('@/views/admin/role/index'),
+  Menu: () => import('@/views/admin/menu/index'),
+  Dept: () => import('@/views/admin/dept/index'),
+  Client: () => import('@/views/setting/client/index'),
+  Dict: () => import('@/views/setting/dict/index'),
+  Log: () => import('@/views/setting/log/index'),
+  Token: () => import('@/views/setting/token/index')
 }
 const asyncRoutes = []
 
 export function generaMenu(routes, data) {
-  data.forEach(item => {
+  data.forEach((item) => {
     let component
     if (item.component === 'Layout') {
       component = Layout
@@ -24,15 +24,13 @@ export function generaMenu(routes, data) {
     }
     const menu = {
       path: item.path,
+      name: item.routeName,
       component: component,
       hidden: item.hidden,
-      noCache: item.noCache,
       children: [],
-      meta: { title: item.name, icon: item.icon }
+      meta: { title: item.name, icon: item.icon, noCache: item.noCache }
     }
-    if (item.component !== 'Layout') {
-      menu.name = item.component
-    } else {
+    if (item.component === 'Layout') {
       menu.redirect = 'noRedirect'
     }
     if (item.children) {

@@ -151,7 +151,7 @@ import { pageByQuery, getById, getMenuIdsById, add, update, updateRoleMenuById, 
 import { getMenuTree } from '@/api/menu'
 import Pagination from '@/components/Pagination'
 export default {
-  name: 'Index',
+  name: 'Role',
   components: { Pagination },
   data() {
     return {

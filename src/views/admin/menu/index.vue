@@ -39,6 +39,10 @@
         width="250"
       />
       <el-table-column
+        prop="routeName"
+        label="路由名称"
+      />
+      <el-table-column
         prop="icon"
         label="图标"
       >
@@ -150,6 +154,11 @@
           <el-col v-show="form.type==='0'" :span="12">
             <el-form-item label="组件" prop="component">
               <el-input v-model="form.component" placeholder="请输入组件" size="small" />
+            </el-form-item>
+          </el-col>
+          <el-col v-show="form.type==='0'" :span="12">
+            <el-form-item label="路由名称" prop="routeName">
+              <el-input v-model="form.routeName" placeholder="请输入路由名称" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -269,7 +278,7 @@ import svgIcons from '@/views/icons/svg-icons'
 import { validURL } from '@/utils/validate'
 
 export default {
-  name: 'Index',
+  name: 'Menu',
   filters: {
     booleanFormat(type) {
       const booleanMap = {
@@ -294,6 +303,12 @@ export default {
       callback()
     }
     const validatePath = (rule, value, callback) => {
+      if (this.form.type === '0' && !value) {
+        return callback(new Error('请输入'))
+      }
+      callback()
+    }
+    const validateRouteName = (rule, value, callback) => {
       if (this.form.type === '0' && !value) {
         return callback(new Error('请输入'))
       }
@@ -345,6 +360,9 @@ export default {
         ],
         path: [
           { validator: validatePath, trigger: 'blur' }
+        ],
+        routeName: [
+          { validator: validateRouteName, trigger: 'blur' }
         ],
         component: [
           { validator: validateComponent, trigger: 'blur' }

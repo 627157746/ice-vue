@@ -237,7 +237,7 @@ import { pageByQuery, getById, add, update, delById, delByIds } from '@/api/user
 import { getRoles } from '@/api/role'
 import Pagination from '@/components/Pagination'
 export default {
-  name: 'Index',
+  name: 'User',
   components: { Pagination },
   data() {
     return {
