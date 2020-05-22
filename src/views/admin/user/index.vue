@@ -16,7 +16,7 @@
             <el-select v-model="query.lockAccount" placeholder="用户状态" size="mini" value="status">
               <el-option
                 v-for="item in userStatus"
-                :key="item.value"
+                :key="item.id"
                 :label="item.label"
                 :value="item.value"
               />
@@ -234,6 +234,7 @@
 <script>
 import { deptTree } from '@/api/dept'
 import { pageByQuery, getById, add, update, delById, delByIds } from '@/api/user'
+import { getDictItemsByType } from '@/api/dict'
 import { getRoles } from '@/api/role'
 import Pagination from '@/components/Pagination'
 export default {
@@ -251,7 +252,7 @@ export default {
         pageNum: 1,
         pageSize: 20,
         phone: null,
-        lockAccount: false,
+        lockAccount: null,
         username: null,
         deptId: null
       },
@@ -285,18 +286,21 @@ export default {
           { required: true, message: '请选择', trigger: 'blur' }
         ]
       },
-      userStatus: [
-        { label: '正常', value: false },
-        { label: '锁定', value: true }
-      ]
+      userStatus: []
     }
   },
   created() {
     this.getDeptTree()
     this.getList()
     this.getRoleList()
+    this.getUserStatus()
   },
   methods: {
+    getUserStatus() {
+      getDictItemsByType('user_status').then(res => {
+        this.userStatus = res.data
+      })
+    },
     getDeptTree() {
       deptTree().then(res => {
         this.deptTreeData = res.data
