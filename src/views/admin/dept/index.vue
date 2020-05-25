@@ -174,6 +174,9 @@ export default {
       this.open = false
     },
     handleCreate() {
+      deptTree(0).then(res => {
+        this.formDeptTree = res.data
+      })
       this.resetForm()
       this.formIsDisable = false
       this.formIsAdd = true

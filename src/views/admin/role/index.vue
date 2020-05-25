@@ -91,8 +91,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="query.pageNum"
-      :limit.sync="query.pageSize"
+      :page.sync="query.current"
+      :limit.sync="query.size"
       @pagination="getList"
     />
     <el-dialog
@@ -159,8 +159,8 @@ export default {
       menuTree: [],
       initLoading: false,
       query: {
-        pageNum: 1,
-        pageSize: 20,
+        current: 1,
+        size: 20,
         name: null
       },
       total: 0,
@@ -200,7 +200,11 @@ export default {
       })
     },
     handleResetQuery() {
-      this.query.name = null
+      this.query = {
+        current: 1,
+        size: 20,
+        name: null
+      }
       this.getList()
     },
     resetForm() {

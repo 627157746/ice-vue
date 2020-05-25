@@ -119,8 +119,8 @@
         <pagination
           v-show="total>0"
           :total="total"
-          :page.sync="query.pageNum"
-          :limit.sync="query.pageSize"
+          :page.sync="query.current"
+          :limit.sync="query.size"
           @pagination="getList"
         />
       </el-col>
@@ -249,8 +249,8 @@ export default {
       total: 0,
       dept: null,
       query: {
-        pageNum: 1,
-        pageSize: 20,
+        current: 1,
+        size: 20,
         phone: null,
         lockAccount: null,
         username: null,
@@ -297,7 +297,7 @@ export default {
   },
   methods: {
     getUserStatus() {
-      getDictItemsByType('user_status').then(res => {
+      getDictItemsByType('sys_user_status').then(res => {
         this.userStatus = res.data
       })
     },
@@ -324,9 +324,14 @@ export default {
       })
     },
     handleResetQuery() {
-      this.query.username = null
-      this.query.phone = null
-      this.query.deptId = null
+      this.query = {
+        current: 1,
+        size: 20,
+        phone: null,
+        lockAccount: null,
+        username: null,
+        deptId: null
+      }
       this.getList()
     },
     closeDialog() {

@@ -104,8 +104,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="query.pageNum"
-      :limit.sync="query.pageSize"
+      :page.sync="query.current"
+      :limit.sync="query.size"
       @pagination="getList"
     />
     <el-dialog
@@ -134,7 +134,7 @@
                   v-for="item in dictType"
                   :key="item.id"
                   :label="item.label"
-                  :value="Number(item.value)"
+                  :value="Boolean(Number(item.value))"
                 />
               </el-select>
             </el-form-item>
@@ -177,8 +177,10 @@ export default {
       initLoading: false,
       total: 0,
       query: {
-        pageNum: 1,
-        pageSize: 20
+        current: 1,
+        size: 20,
+        name: null,
+        type: null
       },
       title: '',
       open: false,
@@ -223,8 +225,12 @@ export default {
       })
     },
     handleResetQuery() {
-      this.query.name = null
-      this.query.type = null
+      this.query = {
+        current: 1,
+        size: 20,
+        name: null,
+        type: null
+      }
       this.getList()
     },
     closeDialog() {
@@ -235,7 +241,7 @@ export default {
       this.form = {
         name: undefined,
         type: undefined,
-        isSystem: 0,
+        isSystem: undefined,
         remarks: undefined
       }
     },

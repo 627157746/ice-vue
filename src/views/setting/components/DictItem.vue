@@ -95,8 +95,8 @@
     <pagination
       v-show="total>0"
       :total="total"
-      :page.sync="query.pageNum"
-      :limit.sync="query.pageSize"
+      :page.sync="query.current"
+      :limit.sync="query.size"
       @pagination="getList"
     />
     <el-dialog
@@ -115,7 +115,7 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="值" prop="value">
-              <el-input v-model="form.value" placeholder="请输入值" size="small" />
+              <el-input v-model="form.value" placeholder="请输入值,布尔值0为false,1为true" size="small" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
@@ -168,8 +168,8 @@ export default {
       initLoading: false,
       total: 0,
       query: {
-        pageNum: 1,
-        pageSize: 20,
+        current: 1,
+        size: 20,
         dictId: this.dict.id,
         label: null
       },
@@ -215,7 +215,12 @@ export default {
       })
     },
     handleResetQuery() {
-      this.query.label = null
+      this.query = {
+        current: 1,
+        size: 20,
+        dictId: this.dict.id,
+        label: null
+      }
       this.getList()
     },
     closeDialog() {

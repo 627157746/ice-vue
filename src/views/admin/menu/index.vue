@@ -146,8 +146,16 @@
           </el-col>
           <el-col v-show="form.type==='0'" :span="12">
             <el-form-item label="图标" prop="icon">
-              <el-input v-model="form.icon" placeholder="请输入图标" size="small" readonly @focus="iconDialog = true">
-                <template v-if="form.icon" slot="prepend"><svg-icon :icon-class="form.icon" class-name="disabled" /></template>
+              <el-input
+                v-model="form.icon"
+                placeholder="请输入图标"
+                size="small"
+                readonly
+                @focus="iconDialog = true"
+              >
+                <template v-if="form.icon" slot="prepend">
+                  <svg-icon :icon-class="form.icon" class-name="disabled" />
+                </template>
               </el-input>
             </el-form-item>
           </el-col>
@@ -186,7 +194,7 @@
                   v-for="(item,index) in noCacheSelect"
                   :key="index"
                   :label="item.label"
-                  :value="item.value"
+                  :value="Boolean(Number(item.value))"
                 />
               </el-select>
             </el-form-item>
@@ -198,7 +206,7 @@
                   v-for="(item,index) in hiddenSelect"
                   :key="index"
                   :label="item.label"
-                  :value="item.value"
+                  :value="Boolean(Number(item.value))"
                 />
               </el-select>
             </el-form-item>
@@ -274,6 +282,7 @@
 
 <script>
 import { getMenuTree, getById, delById, add, update } from '@/api/menu'
+import { getDictItemsByType } from '@/api/dict'
 import svgIcons from '@/views/icons/svg-icons'
 import { validURL } from '@/utils/validate'
 
@@ -371,24 +380,33 @@ export default {
           { validator: validateIcon, trigger: 'blur' }
         ]
       },
-      noCacheSelect: [
-        { label: '是', value: false },
-        { label: '否', value: true }
-      ],
-      hiddenSelect: [
-        { label: '是', value: true },
-        { label: '否', value: false }
-      ],
-      typeSelect: [
-        { label: '菜单', value: '0' },
-        { label: '按钮', value: '1' }
-      ]
+      noCacheSelect: [],
+      hiddenSelect: [],
+      typeSelect: []
     }
   },
   created() {
+    this.getHiddenSelect()
+    this.getNoCacheSelect()
+    this.getTypeSelect()
     this.getMenuTreeData()
   },
   methods: {
+    getHiddenSelect() {
+      getDictItemsByType('sys_menu_hidden').then(res => {
+        this.hiddenSelect = res.data
+      })
+    },
+    getNoCacheSelect() {
+      getDictItemsByType('sys_menu_no_cache').then(res => {
+        this.noCacheSelect = res.data
+      })
+    },
+    getTypeSelect() {
+      getDictItemsByType('sys_menu_type').then(res => {
+        this.typeSelect = res.data
+      })
+    },
     getMenuTreeData() {
       this.initLoading = true
       getMenuTree(true).then(res => {
@@ -501,29 +519,29 @@ export default {
 
 <style lang="scss" scoped>
     .grid {
-      position: relative;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
 
-      .icon-item {
-        margin: 20px;
-        height: 50px;
-        text-align: center;
-        width: 100px;
-        float: left;
-        font-size: 20px;
-        color: #24292e;
-        cursor: pointer;
-      }
+        .icon-item {
+            margin: 20px;
+            height: 50px;
+            text-align: center;
+            width: 100px;
+            float: left;
+            font-size: 20px;
+            color: #24292e;
+            cursor: pointer;
+        }
 
-      span {
-        display: block;
-        font-size: 16px;
-        margin-top: 10px;
-      }
+        span {
+            display: block;
+            font-size: 16px;
+            margin-top: 10px;
+        }
 
-      .disabled {
-        pointer-events: none;
-      }
+        .disabled {
+            pointer-events: none;
+        }
     }
 </style>
