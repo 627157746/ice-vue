@@ -26,6 +26,11 @@
           重置
         </el-button>
       </el-row>
+      <el-row>
+        <el-button class="filter-item" size="mini" type="danger" icon="el-icon-delete" @click="handleDelByIds">
+          批量删除
+        </el-button>
+      </el-row>
     </div>
     <el-table
       ref="table"
@@ -35,6 +40,10 @@
       size="medium"
       highlight-current-row
     >
+      <el-table-column
+        type="selection"
+        width="55"
+      />
       <el-table-column
         prop="id"
         label="序号"

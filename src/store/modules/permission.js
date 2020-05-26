@@ -10,7 +10,8 @@ const componentMap = {
   Client: () => import('@/views/setting/client/index'),
   Dict: () => import('@/views/setting/dict/index'),
   Log: () => import('@/views/setting/log/index'),
-  Token: () => import('@/views/setting/token/index')
+  Token: () => import('@/views/setting/token/index'),
+  Host: () => import('@/views/setting/host/index')
 }
 const asyncRoutes = []
 

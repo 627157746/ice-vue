@@ -64,11 +64,11 @@
       </el-table-column>
       <el-table-column
         prop="noCache"
-        label="缓存"
+        label="不缓存"
       >
         <template slot-scope="scope">
-          <el-tag :type="!scope.row.noCache?'success':'danger'">
-            {{ !scope.row.noCache | booleanFormat }}
+          <el-tag :type="scope.row.noCache?'success':'danger'">
+            {{ scope.row.noCache | booleanFormat }}
           </el-tag>
         </template>
       </el-table-column>
@@ -188,8 +188,8 @@
             </el-form-item>
           </el-col>
           <el-col v-show="form.type==='0'" :span="12">
-            <el-form-item label="缓存">
-              <el-select v-model="form.noCache" placeholder="缓存" size="small" value="noCache">
+            <el-form-item label="不缓存">
+              <el-select v-model="form.noCache" placeholder="不缓存" size="small" value="noCache">
                 <el-option
                   v-for="(item,index) in noCacheSelect"
                   :key="index"
