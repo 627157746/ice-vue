@@ -35,8 +35,12 @@
     <el-table
       ref="table"
       v-loading="initLoading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
       :data="list"
       border
+      height="700"
       size="medium"
       highlight-current-row
     >
@@ -212,8 +216,10 @@ export default {
         this.query.endTime = this.time[1]
       }
       pageByQuery(this.query).then(res => {
+        this.initLoading = false
         this.list = res.data.records
         this.total = res.data.total
+      }).catch(() => {
         this.initLoading = false
       })
     },

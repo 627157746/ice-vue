@@ -83,6 +83,12 @@ export default {
   data() {
     return {
       timer: null,
+      loadingOptions: {
+        lock: true,
+        text: 'Loading',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      },
       host: {
         cpu: [],
         memory: [],
@@ -96,13 +102,22 @@ export default {
     this.init()
   },
   mounted() {
-    this.timer = setInterval(this.init, 5000)
+    this.timer = setInterval(this.getHostInfo, 5000)
   },
   beforeDestroy() {
     clearInterval(this.timer)
   },
   methods: {
     init() {
+      const loading = this.$loading(this.loadingOptions)
+      getHostInfo().then(res => {
+        loading.close()
+        this.host = res.data
+      }).catch(() => {
+        loading.close()
+      })
+    },
+    getHostInfo() {
       getHostInfo().then(res => {
         this.host = res.data
       })

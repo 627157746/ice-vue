@@ -9,6 +9,9 @@
     </div>
     <el-table
       v-loading="initLoading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
       :data="deptTree"
       border
       size="medium"
@@ -156,7 +159,9 @@ export default {
     getDeptTree() {
       this.initLoading = true
       deptTree().then(res => {
+        this.initLoading = false
         this.deptTree = res.data
+      }).catch(() => {
         this.initLoading = false
       })
     },

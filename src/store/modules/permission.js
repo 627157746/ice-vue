@@ -3,15 +3,17 @@ import { getMenusByCurrentUser } from '@/api/menu'
 import Layout from '@/layout'
 
 const componentMap = {
-  User: () => import('@/views/admin/user/index'),
-  Role: () => import('@/views/admin/role/index'),
-  Menu: () => import('@/views/admin/menu/index'),
-  Dept: () => import('@/views/admin/dept/index'),
-  Client: () => import('@/views/setting/client/index'),
-  Dict: () => import('@/views/setting/dict/index'),
-  Log: () => import('@/views/setting/log/index'),
-  Token: () => import('@/views/setting/token/index'),
-  Host: () => import('@/views/setting/host/index')
+  User: () => import('@/views/admin/user'),
+  Role: () => import('@/views/admin/role'),
+  Menu: () => import('@/views/admin/menu'),
+  Dept: () => import('@/views/admin/dept'),
+  Client: () => import('@/views/setting/client'),
+  Dict: () => import('@/views/setting/dict'),
+  Log: () => import('@/views/setting/log'),
+  Token: () => import('@/views/setting/token'),
+  Host: () => import('@/views/setting/host'),
+  FormGen: () => import('@/views/tools/form-gen'),
+  CodeGen: () => import('@/views/tools/code-gen')
 }
 const asyncRoutes = []
 

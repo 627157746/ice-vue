@@ -9,6 +9,9 @@
     </div>
     <el-table
       v-loading="initLoading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
       :data="menuTree"
       border
       size="medium"
@@ -410,7 +413,9 @@ export default {
     getMenuTreeData() {
       this.initLoading = true
       getMenuTree(true).then(res => {
+        this.initLoading = false
         this.menuTree = res.data
+      }).catch(() => {
         this.initLoading = false
       })
       getMenuTree(false).then(res => {
